@@ -69,6 +69,7 @@ import static com.taobao.text.ui.Element.label;
 class MonitorAdviceListener extends ReflectAdviceListenerAdapter {
     // 输出定时任务
     private Timer timer;
+    private MonitorTimer monitorTask;
     // 监控数据
     private ConcurrentHashMap<Key, AtomicReference<Data>> monitorData = new ConcurrentHashMap<Key, AtomicReference<Data>>();
     private final ThreadLocalWatch threadLocalWatch = new ThreadLocalWatch();
@@ -82,15 +83,28 @@ class MonitorAdviceListener extends ReflectAdviceListenerAdapter {
 
     @Override
     public synchronized void create() {
-        if (timer == null) {
-            timer = new Timer("Timer-for-arthas-monitor-" + process.session().getSessionId(), true);
-            timer.scheduleAtFixedRate(new MonitorTimer(monitorData, process, command.getNumberOfLimit()),
-                    0, command.getCycle() * 1000);
+        if (monitorTask == null) {
+            if (command.isWaitMode())
+                monitorTask = new MonitorTimer(monitorData, process, Integer.MAX_VALUE);
+            else
+                monitorTask = new MonitorTimer(monitorData, process, command.getNumberOfLimit());
+        }
+
+        if (!command.isWaitMode()) {
+            if (timer == null) {
+                timer = new Timer("Timer-for-arthas-monitor-" + process.session().getSessionId(), true);
+                timer.scheduleAtFixedRate(monitorTask, 0, command.getCycle() * 1000);
+            }
         }
     }
 
     @Override
     public synchronized void destroy() {
+        if (null != monitorTask) {
+            monitorTask.run();
+            monitorTask = null;
+        }
+
         if (null != timer) {
             timer.cancel();
             timer = null;

@@ -31,6 +31,7 @@ public class MonitorCommand extends EnhancerCommand {
     private int cycle = 60;
     private boolean isRegEx = false;
     private int numberOfLimit = 100;
+    private boolean isWaitMode = false;
 
     @Argument(argName = "class-pattern", index = 0)
     @Description("Path and classname of Pattern Matching")
@@ -60,6 +61,16 @@ public class MonitorCommand extends EnhancerCommand {
     @Description("Threshold of execution times")
     public void setNumberOfLimit(int numberOfLimit) {
         this.numberOfLimit = numberOfLimit;
+    }
+
+    @Option(shortName = "W", longName = "wait", flag = true)
+    @Description("Enabled wait mode")
+    public void setWaitMode(boolean waitMode) {
+        this.isWaitMode = waitMode;
+    }
+
+    public boolean isWaitMode() {
+        return this.isWaitMode;
     }
 
     public String getClassPattern() {

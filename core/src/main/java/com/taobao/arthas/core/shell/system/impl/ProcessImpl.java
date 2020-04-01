@@ -449,7 +449,7 @@ public class ProcessImpl implements Process {
         @Override
         public CommandProcess write(String data) {
             synchronized (ProcessImpl.this) {
-                if (processStatus != ExecStatus.RUNNING) {
+                if (processStatus != ExecStatus.RUNNING && processStatus != ExecStatus.TERMINATED) {
                     throw new IllegalStateException(
                             "Cannot write to standard output when " + status().name().toLowerCase());
                 }

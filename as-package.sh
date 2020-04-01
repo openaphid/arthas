@@ -15,7 +15,7 @@ CUR_VERSION=$(get_local_maven_project_version)
 # arthas's version
 DATE=$(date '+%Y%m%d%H%M%S')
 
-ARTHAS_VERSION="${CUR_VERSION}.${DATE}"
+ARTHAS_VERSION="${CUR_VERSION}.snapshot"
 
 echo "${ARTHAS_VERSION}" > $DIR/core/src/main/resources/com/taobao/arthas/core/res/version
 
@@ -41,6 +41,7 @@ rm -r "$DIR/core/src/main/resources/com/taobao/arthas/core/res/version"
 packaging_bin_path=$(ls "${DIR}"/packaging/target/arthas-*-bin.zip)
 
 # install to local
+rm -rf "${HOME}/.arthas/lib/${ARTHAS_VERSION}"
 mkdir -p "${NEWEST_ARTHAS_LIB_HOME}"
 unzip ${packaging_bin_path} -d "${NEWEST_ARTHAS_LIB_HOME}/"
 
